@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<ruleset name="Library System Coding Standard">
+    <description>圖書借還系統程式碼規範</description>
+
+    <!-- 掃描目錄 -->
+    <file>src</file>
+    <file>tests</file>
+
+    <!-- 使用 PSR-12 -->
+    <rule ref="PSR12"/>
+
+    <!-- 排除目錄 -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/coverage/*</exclude-pattern>
+
+    <!-- 基本設置 -->
+    <arg name="colors"/>
+    <arg value="sp"/>
+    <arg name="report" value="full"/>
+    <arg name="extensions" value="php"/>
+
+    <!-- 縮排使用空格 -->
+    <rule ref="Generic.WhiteSpace.ScopeIndent">
+        <properties>
+            <property name="indent" value="4"/>
+            <property name="tabIndent" value="false"/>
+        </properties>
+    </rule>
+
+    <!-- 行結尾樣式 -->
+    <rule ref="Generic.Files.LineEndings">
+        <properties>
+            <property name="eolChar" value="\n"/>
+        </properties>
+    </rule>
+
+    <!-- 檔案編碼 -->
+    <rule ref="Generic.Files.ByteOrderMark"/>
+
+    <!-- 自訂規則 -->
+    <rule ref="Squiz.Commenting.FunctionComment"/>
+    <rule ref="Squiz.Commenting.ClassComment"/>
+    <rule ref="Squiz.Commenting.VariableComment"/>
+
+    <!-- 命名規範 -->
+    <rule ref="Generic.NamingConventions.UpperCaseConstantName"/>
+    <rule ref="Generic.NamingConventions.CamelCapsFunctionName"/>
+</ruleset>

@@ -1,0 +1,3 @@
+id,isbn,dsedj_no,cal_no,title,author,publisher,published_date,available,image_url,borrow_time
+1,9780321765723,,QA76.73.J38,Effective Java,Joshua Bloch,Addison-Wesley,2008-05-28,1,https://example.com/book1.jpg,10
+2,9780321356680,,QA76.73.C++,The C++ Programming Language,Bjarne Stroustrup,Addison-Wesley,2013-05-19,0,https://example.com/book2.jpg,5
