@@ -1,132 +1,195 @@
+# Site — Astro static
 
-# 圖書借還系統
+A fast, simple **website**: every page is built once into plain files and served from the edge.
+No server, no database, nothing to maintain.
 
-這是一個使用 PHP 開發的圖書借還管理系統。
+- Home (sections), About, Contact (email link, or a link to a hosted form), a 404 page;
+- a **Blog**: one Markdown file per post in `src/content/blog/`, each with its own page, tag
+  pages and an RSS feed (`/rss.xml`);
+- search-ready: a title, description, canonical URL and social card on every page,
+  `/sitemap.xml` and `/robots.txt` built with the site;
+- instant page-to-page navigation (Astro's ClientRouter + prefetch, the only JavaScript, over
+  real prerendered pages), system fonts, one inlined stylesheet, images optimised at build
+  (AVIF/WebP, several sizes, lazy), a strict Content-Security-Policy and security headers;
+- it stands alone: every page, word and post lives in this repo and is built into plain HTML.
 
-## 系統需求
+Need sign-in, a database, forms that store answers, bookings or payments? That is an **app**:
+pick the **Astro app** template (the database toggle in the dashboard) instead.
 
-- PHP 7.4+
-- MySQL 5.7+
-- Git
-- Composer (用於管理依賴)
+## Contents
 
-## 安裝步驟
+- [Quick start](#quick-start)
+- [Requirements](#requirements)
+- [Get the code](#get-the-code)
+- [Scripts](#scripts)
+- [Project structure](#project-structure)
+- [Building on it](#building-on-it) (what not to edit)
+- [Staying up to date](#staying-up-to-date)
+- [Troubleshooting](#troubleshooting)
+- [FAQ](#faq)
+- [On the platform](#on-the-platform) (publishing, posts, words)
 
-1. Clone 專案
+## Quick start
+
+With [Node.js 22.12+](#requirements):
+
 ```bash
-git clone https://github.com/your-username/library-system.git
-cd library-system
+git clone <the template repository's address> my-site
+cd my-site
+npm install
+npm run dev                         # http://localhost:4321
 ```
 
-2. 安裝依賴
+No database, no settings: a website needs neither.
+
+## Requirements
+
+| Tool | Version | Check |
+| --- | --- | --- |
+| Node.js | 22.12 or later (`.nvmrc` says 22: `nvm use`) | `node -v` |
+| npm | the one that comes with Node.js | `npm -v` |
+| git | any | `git --version` |
+
+## Get the code
+
+Clone the template repository, so later releases can be merged into your work
+([Staying up to date](#staying-up-to-date)):
+
 ```bash
-composer install
+git clone <the template repository's address> my-site
+cd my-site
+git remote rename origin upstream             # the template: releases come from here
+git remote add origin <your own repository's address>
+git push -u origin main
 ```
 
-3. 設定資料庫
-- 複製 `config/db.example.php` 為 `config/db.php`
-- 修改 `config/db.php` 中的資料庫連線設定
+Don't use a "Use this template" button or copy the files: that makes a copy with no shared
+history, and `git merge` can no longer tell your changes from the template's. Already did? See
+[Started from a copy](#started-from-a-copy).
 
-4. 建立資料庫結構
+## Scripts
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | the dev server, http://localhost:4321 |
+| `npm run build` | the site into `dist/` (what the platform builds) |
+| `npm run check` | the same build, as the check to run before you push |
+| `npm run preview` | serves the last `npm run build` |
+| `npm run platform -- check` | the template's own files untouched, and is a newer release out ([Staying up to date](#staying-up-to-date)) |
+| `npm run platform -- docs --site <a hosted site's address>` | the platform's latest rules for AI agents, into `.platform/docs/` |
+
+## Project structure
+
+```
+AGENTS.md              rules for AI agents (CLAUDE.md, GEMINI.md import it)
+docs/agent/            the rules by topic: performance, accessibility, SEO, security, publishing
+template.json          which template version this is
+scripts/platform.mjs   template updates and the platform's docs
+public/                files served as they are (_headers: security and cache headers)
+src/content/site.ts    every word on the site
+src/content/blog/      the blog posts (Markdown); schema in src/content.config.ts
+src/assets/            images optimised at build (blog covers in src/assets/blog/)
+src/pages/             index, about, contact, blog/ (+ tags/), 404, rss.xml, sitemap.xml, robots.txt
+src/layouts/Base.astro <head> (SEO tags), header, footer
+src/components/        PostCard, Cover (optimised images)
+src/lib/posts.ts       blog helpers (build time)
+src/lib/site-url.ts    the site's public address (canonical URLs, sitemap, RSS)
+src/styles/global.css  the stylesheet (inlined into every page)
+```
+
+## Building on it
+
+- **Your files**: `src/content/site.ts` (every word), `src/content/blog/` (posts), `src/pages/`,
+  `src/components/`, `src/layouts/`, `src/styles/`, `src/assets/`, `public/`. `AGENTS.md` and
+  `docs/agent/` have the rules: read them, or have your AI read them, before every change.
+- **Never edit the template's own files**: `docs/agent/`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`,
+  `template.json`, `CHANGELOG.md`, `scripts/platform.mjs` and `scripts/managed-files.json`. Releases
+  replace them. Each is compared byte for byte with the release `template.json` names:
+  `npm run platform -- check` lists any that changed, and a store listing that changed or deleted one
+  is refused. Put one back with `git checkout v<your version> -- <file>`. `.gitattributes` keeps every
+  text file LF, so a Windows checkout doesn't change them.
+- **Before you push**: `npm run check` and `npm run platform -- check`. If this project has a
+  `DEVELOPERS.md`, follow its "For your AI" steps (and its ready-to-submit checklist) too.
+
+## Staying up to date
+
+Template releases are tagged `vX.Y.Z` in the template repository you cloned from (`upstream`).
+`CHANGELOG.md` says what each changed and whether it is required. With your work committed:
+
 ```bash
-mysql -u your_username -p your_database < database.sql
+git fetch upstream --tags
+git describe --tags --abbrev=0 upstream/main   # the newest release
+git merge "$(git describe --tags --abbrev=0 upstream/main)"
+npm install
+npm run check
 ```
 
-## 開發規範
+Then follow the new `docs/agent/upgrade.md` for anything that release asks of files you changed.
 
-### Git 分支管理
+**Conflicts** (git lists them; search for `<<<<<<<`):
+- `package-lock.json`: `git checkout --theirs package-lock.json`, then `npm install` (it rebuilds the
+  lock for the merged `package.json`), then commit.
+- The template's own files (`docs/agent/`, `scripts/`, `template.json`, `CHANGELOG.md`, `AGENTS.md`,
+  `CLAUDE.md`, `GEMINI.md`): take the template's (`git checkout --theirs <file>`). Never keep changes of
+  your own in them: describe your project in `README.md` instead.
+- Your files (pages, `src/content/site.ts`, styles): keep your words and look, and bring over what
+  the template changed.
+- `git merge --abort` puts everything back as it was.
 
-- `main`: 主分支，用於部署生產環境
-- `develop`: 開發分支，所有功能開發都從此分支建立
-- `feature/*`: 功能分支，用於開發新功能
-- `hotfix/*`: 緊急修復分支，用於修復生產環境問題
+### Started from a copy
 
-### 開發流程
+No shared history with the template: connect it once, then merge releases as above.
 
-1. 從 develop 分支建立新功能分支
 ```bash
-git checkout develop
-git pull origin develop
-git checkout -b feature/your-feature-name
+git remote add upstream <the template repository's address>
+git fetch upstream --tags
+git merge v<the version in your template.json> --allow-unrelated-histories   # once
+git merge "$(git describe --tags --abbrev=0 upstream/main)"                # then the newest release
 ```
 
-2. 開發完成後，提交程式碼
-```bash
-git add .
-git commit -m "feat: 新增功能描述"
-```
+The first merge lists every file that differs from that release (usually only the ones you
+changed): keep your side of your own files (`git checkout --ours <file>`) and the template's side
+of its own files (`git checkout --theirs <file>`), then commit.
 
-3. 推送到遠端倉庫
-```bash
-git push origin feature/your-feature-name
-```
+## Troubleshooting
 
-4. 在 GitHub/GitLab 上建立 Pull Request，等待審核
+| What you see | Why | Fix |
+| --- | --- | --- |
+| `npm install` warns `EBADENGINE`, or Astro refuses to start | Node.js below 22.12 | `nvm install 22`, then `nvm use 22` (or install 22.12+), then `npm install` again |
+| `npm run dev` says port 4321 is in use, or opens another port | another dev server is running | use the address it prints, or stop the other one (`npx astro dev stop`) |
+| http://localhost:4321 shows a different project | another app already listens on 127.0.0.1:4321, so this one only got the IPv6 address (`[::1]:4321`) and your browser reaches the other app | stop the other app, or run this one on a free port: `npx astro dev stop && npx astro dev --port 4322` |
+| `npm run dev` returns to the prompt with "Dev server running at…" | it runs in the background | `npx astro dev logs` shows its output, `npx astro dev stop` stops it |
+| the build fails on a blog post | its front matter is missing `title`, `description` or `publishedAt`, or a date is malformed | fix the post's top block (`src/content/blog/how-to-add-a-post.md` shows one) |
 
-### Commit 訊息規範
+## FAQ
 
-使用 [Conventional Commits](https://www.conventionalcommits.org/) 規範：
+**Does it need a database or a `.env`?** No. Every page is built into plain files.
 
-- `feat`: 新功能
-- `fix`: 錯誤修復
-- `docs`: 文件更新
-- `style`: 程式碼格式調整
-- `refactor`: 重構
-- `test`: 測試相關
-- `chore`: 建置或工具相關
+**I need sign-in, stored forms or bookings.** That is an app: start from the Astro app template instead.
 
-範例：
-```
-feat: 新增借書功能
-fix: 修復搜尋功能的 SQL 注入問題
-docs: 更新安裝說明文件
-```
+**Can I deploy it somewhere else?** It is built to run on the platform it came from; there is no
+other deploy config.
 
-### 程式碼規範
+---
 
-1. PHP 程式碼規範
-- 遵循 PSR-12 規範
-- 使用有意義的變數名稱
-- 新增適當的註解說明
+## On the platform
 
-2. 資料庫規範
-- 資料表名稱使用小寫英文
-- 欄位名稱使用小寫英文，單字間用底線連接
-- 必須加入適當的索引
-- 重要操作需要加入交易機制
+### Put it live
 
-3. 安全性規範
-- 所有 SQL 查詢必須使用參數化查詢
-- 輸出時必須使用 htmlspecialchars 進行 XSS 防護
-- 檔案操作必須驗證檔案類型和大小
-- Session 相關操作需要防範 CSRF 攻擊
+Pick **Website** when you create a site in the dashboard, change what you like in the editor (or ask
+your AI agent), then **Publish**. The platform installs with `npm ci`, runs `npm run build` and
+serves `dist/`.
 
-## 目錄結構
+### Write a post
 
-```
-├── config/             # 設定檔
-├── pages/             # 功能頁面
-│   ├── book/         # 書籍相關
-│   ├── import/       # 匯入功能
-│   ├── record/       # 記錄相關
-│   └── user/         # 使用者相關
-├── css/              # 樣式檔案
-├── js/               # JavaScript 檔案
-├── vendor/           # Composer 依賴
-├── database.sql      # 資料庫結構
-└── index.php         # 入口檔案
-```
+Add a Markdown file to `src/content/blog/` (the file name is the address: `my-post.md` →
+`/blog/my-post/`) with a `title`, `description` and `publishedAt` at the top. A cover image
+goes in `src/assets/blog/`. See `src/content/blog/how-to-add-a-post.md`. Publish, and it is
+live, with the blog list, tag pages, RSS feed and sitemap.
 
-## 問題回報
+### Change the words
 
-如發現任何問題，請在 GitHub Issues 中回報，並提供：
-
-1. 問題描述
-2. 重現步驟
-3. 預期結果
-4. 實際結果
-5. 相關的錯誤訊息或截圖
-
-## 許可證
-
-本專案採用 MIT 許可證。
+Everything you read on the site is in `src/content/site.ts`: the name, navigation, home sections,
+about text and the contact email. Colours are tokens at the top of `src/styles/global.css`.
+Once you connect your own domain, set `SITE.url` there too (search engines then see that
+address).

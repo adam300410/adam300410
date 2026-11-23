@@ -1,0 +1,45 @@
+---
+/**
+ * The blog list, built from the Markdown files in `src/content/blog/`.
+ * Prerendered like every page: a new post goes live with the next Publish.
+ * Lists every post on one page; past ~30 posts, page it with Astro's
+ * `paginate()` (`/blog/2/`…), keeping this page as page 1.
+ */
+import PostCard from '../../components/PostCard.astro';
+import Base from '../../layouts/Base.astro';
+import {publishedPosts, tagHref, tagsOf} from '../../lib/posts';
+
+const posts = await publishedPosts();
+const tags = tagsOf(posts);
+---
+
+<Base title="Blog" description="Stories, guides and updates.">
+  <section class="wrap section">
+    <h1>Blog</h1>
+    <p class="lede">Stories, guides and updates.</p>
+    {
+      tags.length > 0 && (
+        <nav aria-label="Topics">
+          <ul class="chips">
+            {tags.map(tag => (
+              <li>
+                <a class="chip" href={tagHref(tag.label)}>#{tag.label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )
+    }
+    {
+      posts.length ? (
+        <div class="grid grid-3">
+          {posts.map((post, i) => (
+            <PostCard post={post} as="h2" eager={i < 3} />
+          ))}
+        </div>
+      ) : (
+        <p class="muted">No posts yet. Check back soon.</p>
+      )
+    }
+  </section>
+</Base>

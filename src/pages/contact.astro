@@ -1,0 +1,27 @@
+---
+/**
+ * Contact. A static site cannot receive a form post, so the page offers an
+ * email link (`mailto:`) and, when `CONTACT.formUrl` is set, a link to a form
+ * the owner hosts elsewhere. A form that STORES messages needs the app template.
+ */
+import Base from '../layouts/Base.astro';
+import {CONTACT} from '../content/site';
+
+const mailto = `mailto:${CONTACT.email}?subject=${encodeURIComponent(CONTACT.subject)}`;
+const formUrl = /^https:\/\//.test(CONTACT.formUrl) ? CONTACT.formUrl : null;
+---
+
+<Base title={CONTACT.title} description={CONTACT.lede}>
+  <section class="wrap narrow section">
+    <h1>{CONTACT.title}</h1>
+    <p class="lede">{CONTACT.lede}</p>
+    <div class="card contact-card">
+      <h2>Email us</h2>
+      <p><a href={mailto}>{CONTACT.email}</a></p>
+      <div class="actions">
+        <a class="button" href={mailto}>Write an email</a>
+        {formUrl && <a class="button ghost" href={formUrl} rel="noopener">Use the contact form</a>}
+      </div>
+    </div>
+  </section>
+</Base>

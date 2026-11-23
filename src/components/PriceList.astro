@@ -1,0 +1,82 @@
+---
+/**
+ * A pricing section from the site's catalogue (docs/agent/payments.md › Step 1): one card per
+ * price with its name, amount, interval and trial, and a Buy / Subscribe button that opens the
+ * checkout dialog. The catalogue is read in the browser from this site's address (the owner can
+ * change prices without a Publish), so the cards appear a moment after the page; "Coming soon"
+ * while the site can't take payments yet.
+ *
+ *   <PriceList />                                         every price
+ *   <PriceList keys={['club-monthly', 'club-yearly']} successPath="/thank-you/" />
+ */
+import {allowInlineCheckout} from '../lib/checkout-hosts';
+import CheckoutDialog from './CheckoutDialog.astro';
+
+interface Props {
+  /** Only these price keys, in this order. Default: the whole catalogue. */
+  keys?: string[];
+  /** Where the buyer lands after paying. */
+  successPath?: string;
+}
+
+const {keys = [], successPath = '/'} = Astro.props;
+const id = `prices-${Math.random().toString(36).slice(2, 8)}`;
+const preview = import.meta.env.DEV;
+allowInlineCheckout(Astro.csp);
+---
+
+<div class="price-list" id={id} data-price-list data-keys={keys.join(',')} data-success-path={successPath} data-preview={preview ? '1' : undefined}>
+  <ul class="price-items" role="list" data-price-list-items></ul>
+  <p class="price-list-status" role="status" aria-live="polite" data-price-list-status>Loading prices…</p>
+  <noscript><p class="price-list-status">Turn on JavaScript to see the prices.</p></noscript>
+  <CheckoutDialog id={id} />
+</div>
+
+<script>
+  import {fillPriceLists} from '../lib/buy-button';
+
+  document.addEventListener('astro:page-load', () => void fillPriceLists());
+</script>
+
+<style>
+  .price-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .price-items:empty {
+    display: none;
+  }
+  .price-items :global(.price-card) {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: 0.5rem;
+    padding: 1.25rem;
+    border: 1px solid var(--line, currentColor);
+    border-radius: var(--radius);
+  }
+  .price-items :global(.price-card > *) {
+    margin: 0;
+  }
+  .price-items :global(.price-amount) {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  .price-items :global(.price-every),
+  .price-items :global(.price-description),
+  .price-items :global(.price-trial),
+  .price-items :global(.price-soon),
+  .price-items :global(.buy-status),
+  .price-list-status {
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+  .price-list-status:empty {
+    display: none;
+  }
+</style>

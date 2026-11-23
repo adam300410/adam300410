@@ -1,0 +1,25 @@
+{
+  "template": "astro-static",
+  "version": "0.7.18",
+  "note": "The template's own files and their sha256 for this release. Never edit them (or this file): npm run platform -- check compares them.",
+  "dirs": [
+    "docs/agent/"
+  ],
+  "files": {
+    "AGENTS.md": "972ac65c3214171158e57de101b06d5d77fd19f62b4301344c5ead0d016cd41a",
+    "CHANGELOG.md": "17dc961686d3f456db57337a480d1ad50e96913998e928c5a7c6b8b69cf48daf",
+    "CLAUDE.md": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
+    "GEMINI.md": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
+    "docs/agent/accessibility.md": "79cfcc536c8a3a1fcde8c304cb1cb69ffa31694ad98f48094108861ebfef8902",
+    "docs/agent/payments.md": "b38d0d5b9a21f93515c2bbe2d0749e185a24b9e573b272b776e56be3efc98287",
+    "docs/agent/performance.md": "d288f8491ce767839d067eec70458bbd9097f445ff4e0873b8577b4a22a23e09",
+    "docs/agent/plans-catalogue.md": "53dd4132fba245011aeed8f7de190bb58146466cddb8016d82395488752cbbad",
+    "docs/agent/preview.md": "ff7d763709332e47cfac95d3ce799007fea2830adbc13742b6f7a633ff6ba730",
+    "docs/agent/publishing.md": "268390684129159d4568d2e9889bee26d0a30cde2266d5d2211bb8b523c844b3",
+    "docs/agent/security.md": "3bb3a1ceff3697304417b7f96a1baa9f55c0409716ee29239bcaf0e340ce8d17",
+    "docs/agent/seo.md": "4d865832a52e8b54a0741f64ec3a0bc0ab5ef0153bc2e0988fc8a9ace6242c56",
+    "docs/agent/upgrade.md": "85ccb93b5c5c59963a15e6aa078244a277c088941215d8c1ec84de44b4de730c",
+    "scripts/platform.mjs": "b608900fdc324ec2c47ebb5a655cd4e836bc57d53ba159615c6f3b88e7fe62db",
+    "template.json": "40fa2c3b9159f128411deae2f8dbb72256810f1185054ff46b43bae0d5cc092d"
+  }
+}

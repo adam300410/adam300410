@@ -1,0 +1,5 @@
+{
+  "template": "astro-static",
+  "repo": "file:templates/astro-static",
+  "version": "0.7.18"
+}

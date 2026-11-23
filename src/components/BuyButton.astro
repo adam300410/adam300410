@@ -1,0 +1,86 @@
+---
+/**
+ * A Buy / Subscribe button for ONE price of the site's catalogue (docs/agent/payments.md):
+ *
+ *   <BuyButton price="print-a3" label="Buy the print" />
+ *   <BuyButton price="coaching-monthly" label="Subscribe" successPath="/thank-you/" />
+ *
+ * It opens a dialog on this page: the buyer chooses how to pay (when the owner set up more than
+ * one way), then pays without leaving the page: the provider's form in the dialog, its popup, or
+ * its page in a small payment window (`src/lib/buy-button.ts`). The amount is the catalogue's: never put one here. Needs JavaScript
+ * (a small module from this site). The page it is on allows the payment form's hosts in its CSP
+ * (`src/lib/checkout-hosts.ts`); no other page does. In the Preview it says that payments work on
+ * the published site.
+ */
+import {allowInlineCheckout} from '../lib/checkout-hosts';
+import CheckoutDialog from './CheckoutDialog.astro';
+
+interface Props {
+  /** The price key the owner (or the dashboard) gave the price. */
+  price: string;
+  label?: string;
+  quantity?: number;
+  /** Where the buyer lands after paying. */
+  successPath?: string;
+  /** Where "back" on the checkout goes. Default: this page. */
+  cancelPath?: string;
+  variant?: 'primary' | 'ghost';
+}
+
+const {price, label = 'Buy now', quantity = 1, successPath = '/', cancelPath = Astro.url.pathname, variant = 'primary'} = Astro.props;
+const id = `buy-${price}-${Math.random().toString(36).slice(2, 8)}`;
+// The Preview is the dev server: the platform does not answer on its address.
+const preview = import.meta.env.DEV;
+allowInlineCheckout(Astro.csp);
+---
+
+<div class="buy">
+  <button
+    type="button"
+    class:list={['button', variant === 'ghost' && 'ghost']}
+    data-buy-price={price}
+    data-quantity={String(quantity)}
+    data-success-path={successPath}
+    data-cancel-path={cancelPath}
+    data-pending-label="Opening checkout…"
+    data-preview={preview ? '1' : undefined}
+    data-dialog={`${id}-dialog`}
+    aria-describedby={`${id}-status`}
+  >
+    {label}
+  </button>
+  <p class="buy-status" id={`${id}-status`} role="status" aria-live="polite"></p>
+  <noscript><p class="buy-status">Turn on JavaScript to buy.</p></noscript>
+  <CheckoutDialog id={id} />
+</div>
+
+<script>
+  import {bindBuyButtons} from '../lib/buy-button';
+
+  // Client navigation: runs once per visit; bind the buttons of every page shown.
+  document.addEventListener('astro:page-load', bindBuyButtons);
+</script>
+
+<style>
+  .buy {
+    display: grid;
+    justify-items: start;
+    gap: 0.25rem;
+  }
+  .buy-status {
+    margin: 0;
+    min-height: 1.5em;
+    color: var(--muted);
+    font-size: 0.925rem;
+  }
+  .button[aria-busy='true'] {
+    cursor: progress;
+  }
+  .button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  .buy-status[data-tone='error'] {
+    color: var(--danger, currentColor);
+  }
+</style>

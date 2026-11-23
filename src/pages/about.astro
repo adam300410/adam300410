@@ -1,0 +1,23 @@
+---
+import Base from '../layouts/Base.astro';
+import {ABOUT} from '../content/site';
+---
+
+<Base title={ABOUT.title} description={ABOUT.lede}>
+  <article class="wrap narrow section">
+    <h1>{ABOUT.title}</h1>
+    <p class="lede">{ABOUT.lede}</p>
+    {
+      ABOUT.sections.map(section => (
+        <section class="prose-section">
+          <h2>{section.heading}</h2>
+          <p>{section.body}</p>
+        </section>
+      ))
+    }
+    <div class="actions">
+      <a class="button" href="/contact/">Get in touch</a>
+      <a class="button ghost" href="/blog/">Read the blog</a>
+    </div>
+  </article>
+</Base>

@@ -1,3 +1,0 @@
-id,isbn,cal_no,title,author,publisher,published_date,available,borrow_date,return_date,student_card_number,name,role,image_url,borrow_day
-1,9780321765723,QA76.73.J38,Effective Java,Joshua Bloch,Addison-Wesley,2008-05-28,1,2024-01-15,2024-02-15,STU0001,張三,student,https://example.com/book1.jpg,31
-2,9780321356680,QA76.73.C++,The C++ Programming Language,Bjarne Stroustrup,Addison-Wesley,2013-05-19,0,2023-12-20,2024-01-20,STU0002,李四,teacher,https://example.com/book2.jpg,31

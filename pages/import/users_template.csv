@@ -1,3 +1,0 @@
-id,section,name,class,class_type,student_number,student_card_number,student_id_number,school_card_number,enrollment_year,student_group,valid_or_not,password,name_en,name_cn,unitid,SEN,role,late_return_book,image_url
-1,信息管理學系,王小明,1班,本科,20210001,STU0001,1234567890,SCH0001,2021,A組,1,password,John,王,UNIT123,SEN123,0,0,https://example.com/image1.jpg
-2,會計學系,李美麗,2班,本科,20210002,STU0002,0987654321,SCH0002,2021,B組,1,password,Mary,李,UNIT456,SEN456,0,1,https://example.com/image2.jpg

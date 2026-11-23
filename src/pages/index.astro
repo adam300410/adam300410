@@ -1,0 +1,66 @@
+---
+/**
+ * Home: sections from `src/content/site.ts`, and the three latest posts from
+ * `src/content/blog/`. Fully static: no JavaScript of its own.
+ */
+import PostCard from '../components/PostCard.astro';
+import {HOME} from '../content/site';
+import Base from '../layouts/Base.astro';
+import {publishedPosts} from '../lib/posts';
+
+const latest = (await publishedPosts()).slice(0, 3);
+---
+
+<Base>
+  <section class="hero">
+    <div class="wrap center">
+      <p class="eyebrow">{HOME.hero.eyebrow}</p>
+      <h1>{HOME.hero.title}</h1>
+      <p class="lede">{HOME.hero.body}</p>
+      <div class="actions">
+        <a class="button" href={HOME.hero.primary.href}>{HOME.hero.primary.label}</a>
+        <a class="button ghost" href={HOME.hero.secondary.href}>{HOME.hero.secondary.label}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section" aria-labelledby="features-title">
+    <h2 id="features-title" class="center">{HOME.features.title}</h2>
+    <div class="grid grid-3">
+      {
+        HOME.features.items.map(feature => (
+          <div class="card">
+            <h3>{feature.title}</h3>
+            <p class="muted">{feature.body}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  {
+    latest.length > 0 && (
+      <section class="wrap section" aria-labelledby="latest-title">
+        <div class="section-head">
+          <h2 id="latest-title">Latest from the blog</h2>
+          <a href="/blog/">All posts →</a>
+        </div>
+        <div class="grid grid-3">
+          {latest.map(post => (
+            <PostCard post={post} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  <section class="wrap section">
+    <div class="card cta">
+      <div>
+        <h2>{HOME.cta.title}</h2>
+        <p class="muted">{HOME.cta.body}</p>
+      </div>
+      <a class="button" href="/contact/">Contact us</a>
+    </div>
+  </section>
+</Base>

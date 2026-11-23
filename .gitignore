@@ -1,0 +1,9 @@
+node_modules
+dist
+.astro
+.env
+*.local
+.DS_Store
+
+# Live platform docs fetched by `npm run platform -- docs`.
+.platform/

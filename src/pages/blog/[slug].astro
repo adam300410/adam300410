@@ -1,0 +1,59 @@
+---
+/**
+ * One post: `/blog/<file name>/`, one page per Markdown file, built at build
+ * time. The Markdown is this repo's own content (trusted); never paste HTML
+ * from elsewhere into a post.
+ */
+import {getImage} from 'astro:assets';
+import {render} from 'astro:content';
+
+import Cover from '../../components/Cover.astro';
+import Base from '../../layouts/Base.astro';
+import {postJsonLd} from '../../lib/json-ld';
+import {formatDate, publishedPosts, readingMinutes, tagHref} from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await publishedPosts();
+  return posts.map(post => ({params: {slug: post.id}, props: {post}}));
+}
+
+const {post} = Astro.props;
+const {title, description, publishedAt, updatedAt, author, cover, coverAlt, tags} = post.data;
+const {Content} = await render(post);
+// The social card: a 1200-wide JPEG of a src/assets cover (every app reads JPEG), else the path or URL as given.
+const image = !cover ? undefined : typeof cover === 'string' ? cover : (await getImage({src: cover, width: 1200, format: 'jpg'})).src;
+// Structured data for search: the same facts the page shows (src/lib/json-ld.ts).
+const jsonLd = postJsonLd({path: `/blog/${post.id}/`, title, description, publishedAt, updatedAt, author, image});
+---
+
+<Base title={title} description={description} image={image} imageAlt={coverAlt} type="article" publishedAt={publishedAt} updatedAt={updatedAt} jsonLd={jsonLd}>
+  <article class="wrap narrow section post">
+    <header>
+      <p class="eyebrow"><a href="/blog/">Blog</a></p>
+      <h1>{title}</h1>
+      <p class="meta">
+        <time datetime={publishedAt.toISOString()}>{formatDate(publishedAt)}</time>
+        {updatedAt && <> · updated <time datetime={updatedAt.toISOString()}>{formatDate(updatedAt)}</time></>}
+        {author && <> · {author}</>} · {readingMinutes(post.body)} min read
+      </p>
+    </header>
+    {cover && <Cover class="post-cover" src={cover} alt={coverAlt} width={1200} height={630} sizes="(min-width: 752px) 720px, calc(100vw - 32px)" eager />}
+    <div class="prose">
+      <Content />
+    </div>
+    {
+      tags.length > 0 && (
+        <nav aria-label="Tags">
+          <ul class="chips">
+            {tags.map(tag => (
+              <li>
+                <a class="chip" href={tagHref(tag)}>#{tag}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )
+    }
+    <p><a href="/blog/">← All posts</a></p>
+  </article>
+</Base>

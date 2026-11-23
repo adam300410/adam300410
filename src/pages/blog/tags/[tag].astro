@@ -1,0 +1,28 @@
+---
+/**
+ * One page per tag in use: `/blog/tags/<tag>/`, built from the posts' `tags`
+ * front matter. A tag nobody uses has no page.
+ */
+import PostCard from '../../../components/PostCard.astro';
+import Base from '../../../layouts/Base.astro';
+import {publishedPosts, tagsOf} from '../../../lib/posts';
+
+export async function getStaticPaths() {
+  return tagsOf(await publishedPosts()).map(tag => ({params: {tag: tag.slug}, props: {tag}}));
+}
+
+const {tag} = Astro.props;
+const count = tag.posts.length;
+---
+
+<Base title={`Posts tagged #${tag.label}`} description={`${count} ${count === 1 ? 'post' : 'posts'} tagged #${tag.label}.`}>
+  <section class="wrap section">
+    <p class="eyebrow"><a href="/blog/">Blog</a></p>
+    <h1>#{tag.label}</h1>
+    <p class="lede">{count} {count === 1 ? 'post' : 'posts'}.</p>
+    <div class="grid grid-3">
+      {tag.posts.map((post, i) => <PostCard post={post} as="h2" eager={i < 3} />)}
+    </div>
+    <p><a href="/blog/">← All posts</a></p>
+  </section>
+</Base>
